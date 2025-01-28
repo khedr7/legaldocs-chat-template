@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\DB;
+use App\Traits\ModelHelper;
+use App\Models\$modelName$;
+
+class $modelName$Service
+{
+    use ModelHelper;
+
+    public function getAll()
+    {
+        return $modelName$::all();
+    }
+
+    public function find($$modelVar$Id)
+    {
+        return $this->findOrFail($$modelVar$Id);
+    }
+
+    public function create($validatedData)
+    {
+        DB::beginTransaction();
+
+        $$modelVar$ = $modelName$::create($validatedData);
+
+        DB::commit();
+
+        return $$modelVar$;
+    }
+
+    public function update($validatedData, $$modelVar$Id)
+    {
+        $$modelVar$ = $this->findOrFail($$modelVar$Id);
+
+        DB::beginTransaction();
+
+        $$modelVar$->update($validatedData);
+
+        DB::commit();
+
+        return true;
+    }
+
+    public function delete($$modelVar$Id)
+    {
+        $$modelVar$ = $this->find($$modelVar$Id);
+
+        DB::beginTransaction();
+
+        $$modelVar$->delete();
+
+        DB::commit();
+
+        return true;
+    }
+}

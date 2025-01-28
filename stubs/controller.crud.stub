@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\$modelName$Request;
+use App\Http\Resources\$modelName$Resource;
+use App\Services\$modelName$Service;
+
+class $modelName$Controller extends Controller
+{
+    public function __construct(private $modelName$Service $$modelVar$Service)
+    {
+    }
+
+    public function getAll()
+    {
+        $$pluralModelVar$ = $this->$modelVar$Service->getAll();
+        return $this->successResponse(
+            $this->resource($$pluralModelVar$, $modelName$Resource::class),
+            'dataFetchedSuccessfully'
+        );
+    }
+
+    public function find($$modelVar$Id)
+    {
+        $$modelVar$ = $this->$modelVar$Service->find($$modelVar$Id);
+
+        return $this->successResponse(
+            $this->resource($$modelVar$, $modelName$Resource::class),
+            'dataFetchedSuccessfully'
+        );
+    }
+
+    public function create($modelName$Request $request)
+    {
+        $validatedData = $request->validated();
+        $$modelVar$ = $this->$modelVar$Service->create($validatedData);
+
+        return $this->successResponse(
+            $this->resource($$modelVar$, $modelName$Resource::class),
+            'dataAddedSuccessfully'
+        );
+    }
+
+    public function update($modelName$Request $request, $$modelVar$Id)
+    {
+        $validatedData = $request->validated();
+        $this->$modelVar$Service->update($validatedData, $$modelVar$Id);
+
+        return $this->successResponse(
+            null,
+            'dataUpdatedSuccessfully'
+        );
+    }
+
+    public function delete($$modelVar$Id)
+    {
+        $this->$modelVar$Service->delete($$modelVar$Id);
+
+        return $this->successResponse(
+            null,
+            'dataDeletedSuccessfully'
+        );
+    }
+}
