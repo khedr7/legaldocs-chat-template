@@ -48,7 +48,7 @@ class MessageService
         // Make the API call to get the AI response
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post('https://legalchatbot-760395357156.us-central1.run.app/chat', [
+        ])->post('https://chatbot-service-760395357156.us-central1.run.app/chat', [
             'user_message' => $validatedData['message'],
             'chat_history' => $chat_history,
         ]);

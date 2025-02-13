@@ -120,6 +120,89 @@
 		}
 	});
 
+	// function sendMessage(button) {
+	// 	const messageInput = document.getElementById('message');
+	// 	const message = messageInput.value.trim();
+	// 	const chatArea = document.getElementById('chat-history');
+
+	// 	if (!message) {
+	// 		return;
+	// 	}
+
+	// 	const userMessage = document.createElement('div');
+	// 	userMessage.classList.add('message', 'user-message', 'mb-3', 'p-3', 'rounded', 'ms-auto');
+	// 	userMessage.style.backgroundColor = '#555';
+	// 	userMessage.style.color = 'white';
+	// 	userMessage.style.maxWidth = '60%';
+	// 	userMessage.style.width = 'fit-content';
+	// 	userMessage.style.wordWrap = 'break-word';
+	// 	userMessage.style.whiteSpace = 'normal';
+	// 	userMessage.innerHTML = message;
+	// 	chatArea.appendChild(userMessage);
+
+	// 	chatArea.scrollTop = chatArea.scrollHeight;
+
+	// 	messageInput.value = '';
+
+	// 	$.ajax({
+	// 		type: "POST",
+	// 		url: '{{ route('chat.send') }}',
+	// 		data: {
+	// 			message: message,
+	// 			conversation_id: conversationId,
+	// 			_token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+	// 		},
+	// 		success: function(data) {
+	// 			if (conversationId === null) {
+	// 				conversationId = data.conversation_id;
+	// 				console.log("Updated conversationId: ", conversationId);
+	// 			}
+
+	// 			const botMessage = document.createElement('div');
+
+	// 			// botMessage.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded', 'text-light');
+	// 			botMessage.classList.add('message', 'bot-message');
+
+	// 			// Check if the response contains Arabic characters
+	// 			const isArabic = /[\u0600-\u06FF]/.test(data.response);
+	// 			botMessage.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+
+	// 			// Convert Markdown to HTML (if needed)
+	// 			const parsedResponse = new showdown.Converter().makeHtml(data
+	// 				.response); // Use Showdown.js or a similar library for Markdown
+	// 			botMessage.innerHTML = `<span style="white-space: pre-line;">${parsedResponse}</span>`;
+	// 			// botMessage.innerHTML = `<span style="white-space: pre-line;">${data.response}</span>`;
+
+	// 			// Append the bot message to the chat area
+	// 			chatArea.appendChild(botMessage);
+
+
+	// 			chatArea.scrollTop = chatArea.scrollHeight;
+	// 		},
+	// 		error: function(xhr, status, error) {
+	// 			console.error('Error sending message:', error);
+	// 			const errorMessage = document.createElement('div');
+	// 			errorMessage.classList.add('message', 'error-message', 'mb-3', 'p-3', 'rounded',
+	// 				'text-danger');
+	// 			errorMessage.innerHTML =
+	// 				`<span style="white-space: pre-line;">Error: Unable to send the message. Please try again.</span>`;
+	// 			chatArea.appendChild(errorMessage);
+
+	// 			chatArea.scrollTop = chatArea.scrollHeight;
+	// 		}
+	// 	});
+	// }
+
+	document.addEventListener('DOMContentLoaded', function() {
+		const chatArea = document.getElementById('chat-history');
+		if (chatArea) {
+			// Scroll to the bottom
+			chatArea.scrollTop = chatArea.scrollHeight;
+		}
+	});
+</script>
+
+<script>
 	function sendMessage(button) {
 		const messageInput = document.getElementById('message');
 		const message = messageInput.value.trim();
@@ -129,6 +212,7 @@
 			return;
 		}
 
+		// Create and append the user message
 		const userMessage = document.createElement('div');
 		userMessage.classList.add('message', 'user-message', 'mb-3', 'p-3', 'rounded', 'ms-auto');
 		userMessage.style.backgroundColor = '#555';
@@ -144,6 +228,20 @@
 
 		messageInput.value = '';
 
+		// Create and append the typing animation
+		const typingAnimation = document.createElement('div');
+		typingAnimation.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
+		typingAnimation.style.display = 'flex'; // Ensure dots are side by side
+		typingAnimation.innerHTML = `
+        <div class="typing-animation"></div>
+        <div class="typing-animation"></div>
+        <div class="typing-animation"></div>
+    `;
+		chatArea.appendChild(typingAnimation);
+
+		chatArea.scrollTop = chatArea.scrollHeight;
+
+		// Send the message via AJAX
 		$.ajax({
 			type: "POST",
 			url: '{{ route('chat.send') }}',
@@ -158,36 +256,33 @@
 					console.log("Updated conversationId: ", conversationId);
 				}
 
+				// Remove the typing animation
+				chatArea.removeChild(typingAnimation);
+
+				// Create and append the bot's response
 				const botMessage = document.createElement('div');
-
-				// botMessage.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded', 'text-light');
 				botMessage.classList.add('message', 'bot-message');
-
-				// botMessage.style.borderRadius = '15px';
-				// botMessage.style.color = 'white';
-				// botMessage.style.maxWidth = '100%';
-				// botMessage.style.width = 'fit-content';
-				// botMessage.style.wordWrap = 'break-word';
-				// botMessage.style.whiteSpace = 'normal';
 
 				// Check if the response contains Arabic characters
 				const isArabic = /[\u0600-\u06FF]/.test(data.response);
 				botMessage.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
 
 				// Convert Markdown to HTML (if needed)
-				const parsedResponse = new showdown.Converter().makeHtml(data
-					.response); // Use Showdown.js or a similar library for Markdown
+				const parsedResponse = new showdown.Converter().makeHtml(data.response);
 				botMessage.innerHTML = `<span style="white-space: pre-line;">${parsedResponse}</span>`;
-				// botMessage.innerHTML = `<span style="white-space: pre-line;">${data.response}</span>`;
 
 				// Append the bot message to the chat area
 				chatArea.appendChild(botMessage);
-
 
 				chatArea.scrollTop = chatArea.scrollHeight;
 			},
 			error: function(xhr, status, error) {
 				console.error('Error sending message:', error);
+
+				// Remove the typing animation
+				chatArea.removeChild(typingAnimation);
+
+				// Show an error message
 				const errorMessage = document.createElement('div');
 				errorMessage.classList.add('message', 'error-message', 'mb-3', 'p-3', 'rounded',
 					'text-danger');
@@ -199,12 +294,4 @@
 			}
 		});
 	}
-
-	document.addEventListener('DOMContentLoaded', function() {
-		const chatArea = document.getElementById('chat-history');
-		if (chatArea) {
-			// Scroll to the bottom
-			chatArea.scrollTop = chatArea.scrollHeight;
-		}
-	});
 </script>
