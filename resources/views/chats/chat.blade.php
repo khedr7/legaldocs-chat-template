@@ -10,31 +10,31 @@
 
 			<!-- Sidebar -->
 			<div class="col-md-2 col-3 p-3 vh-100 d-flex flex-column" id="sidebar"
-				style="border-right: 1px solid #444; transition: width 0.5s; color:rgb(27 27 27)">
+				style="transition: width 0.5s; color: var(--sidebar-text); background-color: var(--sidebar-bg);">
 				<form action="{{ route('logout') }}" method="POST">
 					@csrf
-					<div class="d-flex justify-content-between align-items-center mb-3">
-						<h5 class="mb-0 text-white">History</h5>
+					<div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--sidebar-text);">
+						<h5 class="mb-0" style="color: var(--sidebar-text);">History</h5>
 						<div class="d-flex align-items-center gap-2">
-							<a href="{{ route('chat.index') }}" class="btn btn-link text-light p-0" title="New Chat">
+							<a href="{{ route('chat.index') }}" class="btn btn-link p-0" title="New Chat" style="color: var(--sidebar-text);">
 								<i class="fas fa-plus-circle fs-4"></i>
 							</a>
-							<button type="submit" class="btn btn-link text-light p-0">
+							<button type="submit" class="btn btn-link p-0" style="color: var(--sidebar-text);">
 								<i class="fas fa-sign-out-alt fs-4"></i>
 							</button>
 						</div>
 					</div>
 				</form>
 
+
 				<!-- Chat List -->
 				<ul class="list-group flex-grow-1 overflow-auto">
 					@foreach ($groupedChats as $groupName => $chatList)
 						@if (!empty($chatList))
-							<li class="text-white" style="font-size: .75rem;line-height: 2rem">{{ $groupName }}</li>
+							<li class="text-muted" style="font-size: .75rem;line-height: 2rem">{{ $groupName }}</li>
 							@foreach ($chatList as $ch)
-								<a href="{{ route('chat.details', $ch->id) }}" class="text-light text-decoration-none">
-									<li
-										class="list-group-item border-0 p-3 mb-2 bg-dark text-light d-flex align-items-center justify-content-between chat-item"
+								<a href="{{ route('chat.details', $ch->id) }}" class="text-decoration-none">
+									<li class="list-group-item border-0 p-3 mb-2 d-flex align-items-center justify-content-between chat-item"
 										data-id="{{ $ch->id }}"
 										style="height: 35px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; border-radius:.5rem!important">
 										<small class="text-truncate" style="max-width: calc(100% - 30px);">
@@ -49,9 +49,18 @@
 			</div>
 
 			<!-- Main Chat Area -->
-			<div class="col-md-10 col-9 d-flex flex-column vh-100" id="mainChatArea" style="background-color: #252424;">
-				<div class="bg-secondary text-white p-3 d-flex justify-content-between align-items-center">
+			<div class="col-md-10 col-9 d-flex flex-column vh-100" id="mainChatArea" style="background-color: var(--bg-color);">
+				<div class="bg-secondary p-3 d-flex justify-content-between align-items-center">
 					<h5 class="m-0">Legal Documents Chatbot</h5>
+					<!-- Light/Dark Mode Toggle -->
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="themeToggle">
+						<label class="form-check-label" for="themeToggle">
+						</label>
+						<i id="themeIcon" class="fas fa-moon" style="line-height:1.3 !important"></i>
+					</div>
+
+
 				</div>
 
 				<!-- Chat Messages Area -->
@@ -60,7 +69,7 @@
 						@foreach ($chat->messages as $message)
 							@if ($message->message)
 								<div class="message user-message mb-3 p-3 rounded ms-auto"
-									style="background-color: #555; color: white; max-width: 60%; width: fit-content;
+									style="background-color: var(--user-msg-bg); color: var(--text-color); max-width: 60%; width: fit-content;
                                     word-wrap: break-word; white-space: normal; border-radius: 15px!important;"
 									dir="{{ preg_match('/\p{Arabic}/u', $message->message) ? 'rtl' : 'ltr' }}">
 									{{ $message->message }}
@@ -76,40 +85,40 @@
 						@endforeach
 					@else
 						<!-- Placeholder message -->
-						<div class="placeholder-message text-center text-white"
+						<div class="placeholder-message text-center"
 							style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                          font-style: normal; padding: 20px 30px; border-radius: 15px; ">
+                            font-style: normal; padding: 20px 30px; border-radius: 15px; color: var(--text-color);">
 							<h3 style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">Welcome to Your Legal Assistant!</h3>
 							<h5 style="font-size: 1.25rem; margin-bottom: 15px;">I'm a chatbot powered by legal documents to answer your
 								questions.</h5>
-							<h6 style="font-size: 1rem; font-weight: lighter; color: #bbb;">How can I assist you today?</h6>
+							<h6 style="font-size: 1rem; font-weight: lighter; color: var(--bot-msg-text);">How can I assist you today?</h6>
 						</div>
 					@endif
 				</div>
 
-
 				<!-- Message Input Area -->
 				<div class="input-area position-absolute start-50 translate-middle-x p-3"
 					style="
-                            bottom: 20px;
-                            width: calc(100% - 60px); /* Auto adjust to chat container */
-                            max-width: 650px; /* Prevents it from being too large */
-                            border-radius: 25px;
-                            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-                            backdrop-filter: blur(10px);
-                            z-index: 1050;
-                        ">
+                        bottom: 20px;
+                        width: calc(100% - 60px);
+                        max-width: 650px;
+                        border-radius: 25px;
+                        backdrop-filter: blur(10px);
+                        z-index: 1050;
+                        background-color: var(--input-area-bg);
+                    ">
 					<form id="chat-form" class="d-flex align-items-center w-100" method="POST">
 						@csrf
 						<div class="flex-grow-1 position-relative">
-							<textarea class="form-control text-light border-0 px-4 py-3" name="message" id="message"
-							 placeholder="Send a message..." rows="1"
+							<textarea class="form-control border-0 px-4 py-3" name="message" id="message" placeholder="Send a message..."
+							 rows="1"
 							 style="
-                                border-radius: 20px;
-                                background-color: #424242;
-                                resize: none;
-                                overflow: hidden;
-                                box-shadow: none;"
+                                    border-radius: 20px;
+                                    background-color: var(--user-msg-bg);
+                                    color: var(--text-color);
+                                    resize: none;
+                                    overflow: hidden;
+                                    box-shadow: none;"
 							 required></textarea>
 						</div>
 						<button class="btn btn-primary d-flex align-items-center justify-content-center ms-2" type="button"
@@ -117,17 +126,15 @@
 							style="
                                 width: 45px; height: 45px;
                                 border-radius: 50%;
-                                background: #424242;
+                                background: var(--user-msg-bg);
                                 border: none;
                                 box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
 							<i class="fa fa-arrow-up" aria-hidden="true"></i>
 						</button>
 					</form>
 				</div>
-
 			</div>
 		</div>
-
 	</div>
 @endsection
 
@@ -136,6 +143,97 @@
 	integrity="sha384-UG8ao2jwOWB7/oDdObZc6ItJmwUkR/PfMyt9Qs5AwX7PsnYn1CRKCTWyncPTWvaS" crossorigin="anonymous">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+
+<script>
+	// Theme Toggle Functionality
+	document.addEventListener('DOMContentLoaded', function() {
+		const themeToggle = document.getElementById('themeToggle');
+		const body = document.body;
+
+		// Check localStorage for theme preference
+		const savedTheme = localStorage.getItem('theme');
+		if (savedTheme === 'light-mode') {
+			body.classList.add('light-mode');
+			themeToggle.checked = true;
+		}
+
+		// Toggle theme on switch change
+		themeToggle.addEventListener('change', function() {
+			if (this.checked) {
+				body.classList.add('light-mode');
+				localStorage.setItem('theme', 'light-mode');
+			} else {
+				body.classList.remove('light-mode');
+				localStorage.setItem('theme', 'dark-mode');
+			}
+		});
+	});
+
+	document.addEventListener("DOMContentLoaded", function() {
+		const themeToggle = document.getElementById("themeToggle");
+		const themeIcon = document.getElementById("themeIcon");
+		const body = document.body;
+
+		// Check local storage for saved theme preference
+		if (localStorage.getItem("theme") === "light") {
+			body.classList.add("light-mode");
+			themeToggle.checked = true;
+			themeIcon.classList.replace("fa-moon", "fa-sun");
+		}
+
+		// Toggle theme on switch change
+		themeToggle.addEventListener("change", function() {
+			if (this.checked) {
+				body.classList.add("light-mode");
+				themeIcon.classList.replace("fa-moon", "fa-sun");
+				localStorage.setItem("theme", "light"); // Save preference
+			} else {
+				body.classList.remove("light-mode");
+				themeIcon.classList.replace("fa-sun", "fa-moon");
+				localStorage.setItem("theme", "dark"); // Save preference
+			}
+		});
+	});
+
+	document.addEventListener("DOMContentLoaded", function() {
+		const themeToggle = document.getElementById("themeToggle");
+		const sidebarToggle = document.getElementById("sidebarToggle");
+		const body = document.body;
+
+		// Apply saved theme
+		if (localStorage.getItem("theme") === "light") {
+			body.classList.add("light-mode");
+			sidebarToggle.style.color = "white"; // Light mode color
+		} else {
+			sidebarToggle.style.color = "black"; // Dark mode color
+		}
+
+		// Listen for theme toggle
+		themeToggle.addEventListener("change", function() {
+			if (this.checked) {
+				body.classList.add("light-mode");
+				sidebarToggle.style.color = "white";
+				localStorage.setItem("theme", "light");
+			} else {
+				body.classList.remove("light-mode");
+				sidebarToggle.style.color = "black";
+				localStorage.setItem("theme", "dark");
+			}
+		});
+	});
+
+	function toggleTheme() {
+		const body = document.body;
+		body.classList.toggle("light-mode");
+
+		const arrowIcon = document.querySelector(".fa-arrow-up");
+		if (body.classList.contains("light-mode")) {
+			arrowIcon.style.color = "black";
+		} else {
+			arrowIcon.style.color = "white";
+		}
+	}
+</script>
 
 <script>
 	// Declare the conversationId outside the sendMessage function
@@ -149,7 +247,7 @@
 
 		function closeSidebar() {
 			sidebar.style.width = "0"; // Close sidebar
-			sidebar.style.borderRight = "0px solid rgb(68, 68, 68)"; // Remove border
+			// sidebar.style.borderRight = "0px solid rgb(68, 68, 68)"; // Remove border
 			sidebar.classList.remove("p-3");
 			mainChatArea.style.marginLeft = "0"; // Expand main chat area
 			mainChatArea.style.removeProperty('display'); // Remove the display property
@@ -157,7 +255,7 @@
 
 		function openSidebar() {
 			sidebar.classList.add("p-3");
-			sidebar.style.borderRight = "1px solid rgb(68, 68, 68)"; // Apply border
+			// sidebar.style.borderRight = "1px solid rgb(68, 68, 68)"; // Apply border
 			sidebar.style.width = "300px"; // Open sidebar
 
 			// Hide the mainChatArea when the sidebar is open
@@ -223,15 +321,22 @@
 			placeholderMessage.style.display = 'none'; // Hide the placeholder message
 		}
 
+		// Detect if the message contains Arabic characters
+		const isArabic = /[\u0600-\u06FF]/.test(message);
+		const direction = isArabic ? 'rtl' : 'ltr';
+
 		// Create and append the user message
 		const userMessage = document.createElement('div');
 		userMessage.classList.add('message', 'user-message', 'mb-3', 'p-3', 'rounded', 'ms-auto');
-		userMessage.style.backgroundColor = '#555';
-		userMessage.style.color = 'white';
-		userMessage.style.maxWidth = '60%';
-		userMessage.style.width = 'fit-content';
-		userMessage.style.wordWrap = 'break-word';
-		userMessage.style.whiteSpace = 'normal';
+		userMessage.setAttribute("style",
+			"background-color: var(--user-msg-bg) !important; " +
+			"color: var(--text-color) !important; " +
+			"max-width: 60% !important; " +
+			"width: fit-content !important; " +
+			"word-wrap: break-word !important; " +
+			"white-space: normal !important; " +
+			"border-radius: 15px !important;");
+		userMessage.setAttribute('dir', direction);
 		userMessage.innerHTML = message;
 		chatArea.appendChild(userMessage);
 
@@ -270,21 +375,27 @@
 				// Remove the typing animation
 				chatArea.removeChild(typingAnimation);
 
+				// Detect if the bot's response contains Arabic characters
+				const isBotArabic = /[\u0600-\u06FF]/.test(data.response);
+				const botDirection = isBotArabic ? 'rtl' : 'ltr';
+
 				// Create and append the bot's response
 				const botMessage = document.createElement('div');
-				botMessage.classList.add('message', 'bot-message');
-
-				// Check if the response contains Arabic characters
-				const isArabic = /[\u0600-\u06FF]/.test(data.response);
-				botMessage.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+				botMessage.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
+				botMessage.style.backgroundColor = 'var(--bot-msg-bg)';
+				botMessage.style.color = 'var(--bot-msg-text)';
+				botMessage.style.maxWidth = '60%';
+				botMessage.style.width = 'fit-content';
+				botMessage.style.wordWrap = 'break-word';
+				botMessage.style.whiteSpace = 'normal';
+				botMessage.style.borderRadius = '15px';
+				botMessage.setAttribute('dir', botDirection);
 
 				// Convert Markdown to HTML (if needed)
 				const parsedResponse = new showdown.Converter().makeHtml(data.response);
 				botMessage.innerHTML = `<span style="white-space: pre-line;">${parsedResponse}</span>`;
 
-				// Append the bot message to the chat area
 				chatArea.appendChild(botMessage);
-
 				chatArea.scrollTop = chatArea.scrollHeight;
 			},
 			error: function(xhr, status, error) {
