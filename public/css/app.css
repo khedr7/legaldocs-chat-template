@@ -17,7 +17,7 @@ body {
 
 /* Header (Top Bar) */
 .bg-secondary {
-    background-color: #212121 !important; /* Top bar background */
+    background-color: #252424 !important; /* Top bar background */
 }
 
 h4,
@@ -63,8 +63,10 @@ h5 {
     background-color: #333;
     border-top: 1px solid #444;
     padding: 15px;
-    position: sticky;
+    position: absolute;
     bottom: 0;
+    width: 100%;
+    z-index: 10; /* Keeps the input area above the chat area */
 }
 
 .input-area input {
@@ -99,6 +101,7 @@ h5 {
 html,
 body {
     height: 100%;
+    margin: 0;
 }
 
 /* Make sidebar thinner and full screen */
@@ -133,6 +136,30 @@ body {
     transition: width 0.5s ease, opacity 0.3s ease;
     opacity: 0; /* Hide sidebar by default */
     border-right: 1px solid #444;
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #333;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+        border: 2px solid #444;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    ::-webkit-scrollbar-corner {
+        background-color: #333;
+    }
 }
 
 /* When sidebar is open */
@@ -155,16 +182,40 @@ body {
 }
 
 /* Chat Area */
+
 .chat-area {
-    background-color: #212121; /* Dark grey background */
-    padding-top: 20px;
-    padding-bottom: 20px;
-    overflow-y: auto;
-    flex-grow: 1;
-    transition: margin-left 0.3s ease; /* Smooth transition for chat area */
-    position: relative;
+    background-color: #252424; /* Dark grey background */
+    flex-grow: 1 !important; /*  Ensures it takes all available space */
+    overflow-y: auto; /* Scrollable content */
+    padding: 20px;
+    margin-bottom: 70px; /* Make room for the input area */
     display: flex;
     flex-direction: column;
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #333;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+        border: 2px solid #444;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    ::-webkit-scrollbar-corner {
+        background-color: #333;
+    }
 }
 
 /* When sidebar is open, hide chat area */
@@ -207,9 +258,11 @@ body {
 }
 
 #mainChatArea {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full height of the viewport */
     position: relative;
-    z-index: 1000; /* Place chat area below sidebar */
-    transition: filter 0.3s ease;
 }
 
 /* Dim the chat area when the sidebar is open */
@@ -242,7 +295,9 @@ body {
 }
 
 @keyframes typing {
-    0%, 60%, 100% {
+    0%,
+    60%,
+    100% {
         transform: translateY(0);
     }
     30% {
@@ -250,3 +305,49 @@ body {
     }
 }
 
+.chat-item {
+    background-color: transparent !important; /* Remove default background */
+    transition: background-color 0.3s ease;
+}
+
+.chat-item.active-chat {
+    background-color: #424242 !important; /* Active chat background */
+}
+
+.chat-item.hover-chat {
+    background-color: #ffffff1a !important; /* Slight highlight on hover */
+}
+
+/* Style the scrollbar */
+::-webkit-scrollbar {
+    width: 8px; /* Width of the vertical scrollbar */
+    height: 8px; /* Height of the horizontal scrollbar */
+}
+
+/* Style the scrollbar track (background of the scrollbar) */
+::-webkit-scrollbar-track {
+    background-color: #333; /* Dark background for the track */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+/* Style the scrollbar thumb (the part you drag) */
+::-webkit-scrollbar-thumb {
+    background-color: #888; /* Light gray thumb */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    border: 2px solid #444; /* Border around the thumb */
+}
+
+/* Style the scrollbar thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Darker gray when hovering */
+}
+
+/* Style the scrollbar corner (bottom-right corner where both scrollbars meet) */
+::-webkit-scrollbar-corner {
+    background-color: #333; /* Same as track background */
+}
+
+.container-fluid {
+    display: flex;
+    height: 100vh;
+}
