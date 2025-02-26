@@ -19,15 +19,15 @@ class MessageController extends Controller
         );
     }
 
-    public function find($messageId)
-    {
-        $message = $this->messageService->find($messageId);
+    // public function find($messageId)
+    // {
+    //     $message = $this->messageService->find($messageId);
 
-        return $this->successResponse(
-            $this->resource($message, MessageResource::class),
-            'dataFetchedSuccessfully'
-        );
-    }
+    //     return $this->successResponse(
+    //         $this->resource($message, MessageResource::class),
+    //         'dataFetchedSuccessfully'
+    //     );
+    // }
 
     public function sendMessage(MessageRequest $request)
     {
@@ -66,13 +66,13 @@ class MessageController extends Controller
     //     );
     // }
 
-    public function delete($messageId)
-    {
-        $this->messageService->delete($messageId);
+    // public function delete($messageId)
+    // {
+    //     $this->messageService->delete($messageId);
 
-        return $this->successResponse(
-            null,
-            'dataDeletedSuccessfully'
-        );
-    }
+    //     return $this->successResponse(
+    //         null,
+    //         'dataDeletedSuccessfully'
+    //     );
+    // }
 }

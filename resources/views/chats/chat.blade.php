@@ -85,13 +85,10 @@
 						@endforeach
 					@else
 						<!-- Placeholder message -->
-						<div class="placeholder-message text-center"
-							style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                            font-style: normal; padding: 20px 30px; border-radius: 15px; color: var(--text-color);">
-							<h3 style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">Welcome to Your Legal Assistant!</h3>
-							<h5 style="font-size: 1.25rem; margin-bottom: 15px;">I'm a chatbot powered by legal documents to answer your
-								questions.</h5>
-							<h6 style="font-size: 1rem; font-weight: lighter; color: var(--bot-msg-text);">How can I assist you today?</h6>
+						<div class="placeholder-message text-center">
+							<h3 class="welcome-title">Welcome to Your Legal Assistant!</h3>
+							<h5 class="welcome-subtitle">I'm a chatbot powered by legal documents to answer your questions.</h5>
+							<h6 class="welcome-footer">How can I assist you today?</h6>
 						</div>
 					@endif
 				</div>
@@ -110,29 +107,33 @@
 					<form id="chat-form" class="d-flex align-items-center w-100" method="POST">
 						@csrf
 						<div class="flex-grow-1 position-relative">
-							<textarea class="form-control border-0 px-4 py-3" name="message" id="message" placeholder="Send a message..."
-							 rows="1"
+							<textarea class="form-control border-0 px-4 py-3 auto-expand" name="message" id="message"
+							 placeholder="Send a message..." rows="1"
 							 style="
-                                    border-radius: 20px;
-                                    background-color: var(--user-msg-bg);
-                                    color: var(--text-color);
-                                    resize: none;
-                                    overflow: hidden;
-                                    box-shadow: none;"
+                                border-radius: 20px;
+                                background-color: var(--user-msg-bg);
+                                color: var(--text-color);
+                                resize: none;
+                                overflow-y: auto;
+                                box-shadow: none;
+                            "
 							 required></textarea>
 						</div>
 						<button class="btn btn-primary d-flex align-items-center justify-content-center ms-2" type="button"
 							onclick="sendMessage(this)"
 							style="
-                                width: 45px; height: 45px;
+                                width: 45px;
+                                height: 45px;
                                 border-radius: 50%;
                                 background: var(--user-msg-bg);
                                 border: none;
-                                box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                            ">
 							<i class="fa fa-arrow-up" aria-hidden="true"></i>
 						</button>
 					</form>
 				</div>
+
 			</div>
 		</div>
 	</div>
@@ -233,6 +234,29 @@
 			arrowIcon.style.color = "white";
 		}
 	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		const textarea = document.querySelector('.auto-expand');
+		const maxRows = 6;
+
+		textarea.addEventListener('input', function() {
+			// Reset height to recalc scrollHeight
+			this.style.height = 'auto';
+
+			// Calculate the height for one row. This may vary based on your styling.
+			const lineHeight = parseInt(window.getComputedStyle(this).lineHeight);
+			const rows = Math.floor(this.scrollHeight / lineHeight);
+
+			if (rows <= maxRows) {
+				this.style.height = `${this.scrollHeight}px`;
+				this.style.overflowY = 'hidden';
+			} else {
+				// Cap the height to maxRows
+				this.style.height = `${lineHeight * maxRows}px`;
+				this.style.overflowY = 'auto';
+			}
+		});
+	});
 </script>
 
 <script>
@@ -306,116 +330,124 @@
 </script>
 
 <script>
-	function sendMessage(button) {
-		const messageInput = document.getElementById('message');
-		const message = messageInput.value.trim();
-		const chatArea = document.getElementById('chat-history');
+	document.addEventListener("DOMContentLoaded", function() {
+		const textarea = document.getElementById("message");
+		const form = document.getElementById("chat-form");
+		const chatArea = document.getElementById("chat-history");
 
-		if (!message) {
-			return;
-		}
-
-		// Remove the placeholder message if it exists
-		const placeholderMessage = document.querySelector('.placeholder-message');
-		if (placeholderMessage) {
-			placeholderMessage.style.display = 'none'; // Hide the placeholder message
-		}
-
-		// Detect if the message contains Arabic characters
-		const isArabic = /[\u0600-\u06FF]/.test(message);
-		const direction = isArabic ? 'rtl' : 'ltr';
-
-		// Create and append the user message
-		const userMessage = document.createElement('div');
-		userMessage.classList.add('message', 'user-message', 'mb-3', 'p-3', 'rounded', 'ms-auto');
-		userMessage.setAttribute("style",
-			"background-color: var(--user-msg-bg) !important; " +
-			"color: var(--text-color) !important; " +
-			"max-width: 60% !important; " +
-			"width: fit-content !important; " +
-			"word-wrap: break-word !important; " +
-			"white-space: normal !important; " +
-			"border-radius: 15px !important;");
-		userMessage.setAttribute('dir', direction);
-		userMessage.innerHTML = message;
-		chatArea.appendChild(userMessage);
-
-		chatArea.scrollTop = chatArea.scrollHeight;
-
-		messageInput.value = '';
-
-		// Create and append the typing animation
-		const typingAnimation = document.createElement('div');
-		typingAnimation.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
-		typingAnimation.style.display = 'flex'; // Ensure dots are side by side
-		typingAnimation.innerHTML = `
-        <div class="typing-animation"></div>
-        <div class="typing-animation"></div>
-        <div class="typing-animation"></div>
-    `;
-		chatArea.appendChild(typingAnimation);
-
-		chatArea.scrollTop = chatArea.scrollHeight;
-
-		// Send the message via AJAX
-		$.ajax({
-			type: "POST",
-			url: '{{ route('chat.send') }}',
-			data: {
-				message: message,
-				conversation_id: conversationId,
-				_token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-			},
-			success: function(data) {
-				if (conversationId === null) {
-					conversationId = data.conversation_id;
-					console.log("Updated conversationId: ", conversationId);
-				}
-
-				// Remove the typing animation
-				chatArea.removeChild(typingAnimation);
-
-				// Detect if the bot's response contains Arabic characters
-				const isBotArabic = /[\u0600-\u06FF]/.test(data.response);
-				const botDirection = isBotArabic ? 'rtl' : 'ltr';
-
-				// Create and append the bot's response
-				const botMessage = document.createElement('div');
-				botMessage.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
-				botMessage.style.backgroundColor = 'var(--bot-msg-bg)';
-				botMessage.style.color = 'var(--bot-msg-text)';
-				botMessage.style.maxWidth = '60%';
-				botMessage.style.width = 'fit-content';
-				botMessage.style.wordWrap = 'break-word';
-				botMessage.style.whiteSpace = 'normal';
-				botMessage.style.borderRadius = '15px';
-				botMessage.setAttribute('dir', botDirection);
-
-				// Convert Markdown to HTML (if needed)
-				const parsedResponse = new showdown.Converter().makeHtml(data.response);
-				botMessage.innerHTML = `<span style="white-space: pre-line;">${parsedResponse}</span>`;
-
-				chatArea.appendChild(botMessage);
-				chatArea.scrollTop = chatArea.scrollHeight;
-			},
-			error: function(xhr, status, error) {
-				console.error('Error sending message:', error);
-
-				// Remove the typing animation
-				chatArea.removeChild(typingAnimation);
-
-				// Show an error message
-				const errorMessage = document.createElement('div');
-				errorMessage.classList.add('message', 'error-message', 'mb-3', 'p-3', 'rounded',
-					'text-danger');
-				errorMessage.innerHTML =
-					`<span style="white-space: pre-line;">Error: Unable to send the message. Please try again.</span>`;
-				chatArea.appendChild(errorMessage);
-
-				chatArea.scrollTop = chatArea.scrollHeight;
+		textarea.addEventListener("keydown", function(event) {
+			if (event.key === "Enter" && !event.shiftKey) {
+				event.preventDefault(); // Prevent new line
+				sendMessage();
 			}
 		});
-	}
+
+		textarea.addEventListener("input", function() {
+			this.style.height = "auto"; // Reset height
+			this.style.height = Math.min(this.scrollHeight, 150) + "px"; // Limit expansion
+		});
+
+
+		function sendMessage() {
+			const message = textarea.value.trim();
+			if (!message) return;
+
+			// Remove placeholder message
+			const placeholderMessage = document.querySelector('.placeholder-message');
+			if (placeholderMessage) placeholderMessage.style.display = 'none';
+
+			// Detect Arabic text direction
+			const isArabic = /[\u0600-\u06FF]/.test(message);
+			const direction = isArabic ? 'rtl' : 'ltr';
+
+			// Append user message
+			const userMessage = document.createElement('div');
+			userMessage.classList.add('message', 'user-message', 'mb-3', 'p-3', 'rounded', 'ms-auto');
+			userMessage.setAttribute("style",
+				"background-color: var(--user-msg-bg) !important; " +
+				"color: var(--text-color) !important; " +
+				"max-width: 60% !important; " +
+				"width: fit-content !important; " +
+				"word-wrap: break-word !important; " +
+				"white-space: normal !important; " +
+				"border-radius: 15px !important;");
+			userMessage.setAttribute('dir', direction);
+			userMessage.innerHTML = message;
+			chatArea.appendChild(userMessage);
+			chatArea.scrollTop = chatArea.scrollHeight;
+
+			textarea.value = "";
+			textarea.style.height = "auto";
+
+			// Create typing animation
+			const typingAnimation = document.createElement('div');
+			typingAnimation.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
+			typingAnimation.style.display = 'flex';
+			typingAnimation.innerHTML = `
+                <div class="typing-animation"></div>
+                <div class="typing-animation"></div>
+                <div class="typing-animation"></div>
+            `;
+			chatArea.appendChild(typingAnimation);
+			chatArea.scrollTop = chatArea.scrollHeight;
+
+			// Send the message via AJAX
+			$.ajax({
+				type: "POST",
+				url: '{{ route('chat.send') }}',
+				data: {
+					message: message,
+					conversation_id: conversationId,
+					_token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+				},
+				success: function(data) {
+					if (conversationId === null) {
+						conversationId = data.conversation_id;
+						console.log("Updated conversationId: ", conversationId);
+					}
+
+					chatArea.removeChild(typingAnimation);
+
+					// Detect Arabic response
+					const isBotArabic = /[\u0600-\u06FF]/.test(data.response);
+					const botDirection = isBotArabic ? 'rtl' : 'ltr';
+
+					// Append bot response
+					const botMessage = document.createElement('div');
+					botMessage.classList.add('message', 'bot-message', 'mb-3', 'p-3', 'rounded');
+					botMessage.style.backgroundColor = 'var(--bot-msg-bg)';
+					botMessage.style.color = 'var(--bot-msg-text)';
+					botMessage.style.maxWidth = '60%';
+					botMessage.style.width = 'fit-content';
+					botMessage.style.wordWrap = 'break-word';
+					botMessage.style.whiteSpace = 'normal';
+					botMessage.style.borderRadius = '15px';
+					botMessage.setAttribute('dir', botDirection);
+
+					// Convert Markdown to HTML (if needed)
+					const parsedResponse = new showdown.Converter().makeHtml(data.response);
+					botMessage.innerHTML =
+						`<span style="white-space: pre-line;">${parsedResponse}</span>`;
+
+					chatArea.appendChild(botMessage);
+					chatArea.scrollTop = chatArea.scrollHeight;
+				},
+				error: function(xhr, status, error) {
+					console.error('Error sending message:', error);
+					chatArea.removeChild(typingAnimation);
+
+					const errorMessage = document.createElement('div');
+					errorMessage.classList.add('message', 'error-message', 'mb-3', 'p-3', 'rounded',
+						'text-danger');
+					errorMessage.innerHTML =
+						`<span style="white-space: pre-line;">Error: Unable to send the message. Please try again.</span>`;
+					chatArea.appendChild(errorMessage);
+
+					chatArea.scrollTop = chatArea.scrollHeight;
+				}
+			});
+		}
+	});
 </script>
 
 <script>

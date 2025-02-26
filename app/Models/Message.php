@@ -23,4 +23,9 @@ class Message extends Model
         return $this->belongsTo(Conversation::class, 'conversation_id', 'id');
     }
 
+    public function messageDocuments()
+    {
+        return $this->hasMany(MessageDocument::class);
+    }
+
 }
